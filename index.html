@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Party Planner</title>
+    <link rel="stylesheet" href="./index.css" />
+</head>
+  <body>
+    <h1>Party List</h1>
+  
+    <ul>
+        <li>
+          <p> <Party: class="name"></party></p>
+          <p> <Date: class="party.date.toDateString"></date></p>
+          <p> <Time: class="party.time"></Time:></p>
+          <p> <Location: class="party.location"></Location:></p>
+          <p> <Description: class="party.description"></Description:></p>
+          <form action="/delete/=party._id" method="post">
+            <button type="submit">Delete</button>
+          </form>
+        </li>
+    </ul>
+  
+    <h2>Schedule a New Party</h2>
+  
+    <form action="/add" method="post">
+      <label for="name">Name:</label>
+      <input type="text" name="name" required><br>
+  
+      <label for="date">Date:</label>
+      <input type="date" name="date" required><br>
+  
+      <label for="time">Time:</label>
+      <input type="text" name="time" required><br>
+  
+      <label for="location">Location:</label>
+      <input type="text" name="location" required><br>
+  
+      <label for="description">Description:</label>
+      <textarea name="description" required></textarea><br>
+  
+      <button type="submit">Submit</button>
+    </form>
+  </body>
+  <script src="./index.js"></script>
+  </html>
