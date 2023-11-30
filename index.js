@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('YOUR_API_ENDPOINT')
         .then(response => response.json())
         .then(data => {
+            // console.log('API Response:', data);
             // Display parties in the list
             data.forEach(party => {
                 addPartyToList(party);
