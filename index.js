@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const description = document.getElementById('description').value;
 
         // Send a POST request to add the new party
-        fetch('YOUR_API_ENDPOINT', {
+        fetch('https://fsa-crud-2aa9294fe819.herokuapp.com/api/2310-FSA-ET-WEB-PT-SF-B/recipes', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -34,21 +34,28 @@ document.addEventListener('DOMContentLoaded', function () {
             // Add the new party to the list
             addPartyToList(data);
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => console.error('Error adding party:', error));
     });
 
     function fetchParties() {
         // Fetch parties from the API
-        fetch('YOUR_API_ENDPOINT')
-        .then(response => response.json())
-        .then(data => {
-            // console.log('API Response:', data);
-            // Display parties in the list
-            data.forEach(party => {
-                addPartyToList(party);
-            });
-        })
-        .catch(error => console.error('Error:', error));
+        fetch('https://fsa-crud-2aa9294fe819.herokuapp.com/api/2310-FSA-ET-WEB-PT-SF-B/recipes')
+            .then(response => response.json())
+            .then(responseData => {
+                console.log('API Response:', responseData); // Log the API response to inspect it
+    
+                // Check if data is an array or has the expected structure
+                if (Array.isArray(responseData.data)) {
+                    // Display parties in the list
+                    responseData.data.forEach(party => {
+                        addPartyToList(party);
+                    });
+                } else {
+                    console.error('Unexpected API response:', responseData);
+                    // Handle the unexpected response as needed
+                }
+            })
+            .catch(error => console.error('Error fetching parties:', error));
     }
 
     function addPartyToList(party) {
@@ -69,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function deleteParty(partyId) {
         // Send a DELETE request to remove the party
-        fetch(`YOUR_API_ENDPOINT/${partyId}`, {
+        fetch(`https://fsa-crud-2aa9294fe819.herokuapp.com/api/2310-FSA-ET-WEB-PT-SF-B/recipes/${partyId}`, {
             method: 'DELETE',
         })
         .then(response => response.json())
@@ -78,6 +85,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const listItem = document.querySelector(`li:has(button[onclick="deleteParty(${partyId})"])`);
             listItem.remove();
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => console.error('Error deleting party:', error));
     }
 });
