@@ -15,8 +15,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const location = document.getElementById('location').value;
         const description = document.getElementById('description').value;
 
+        // Validate the form data before submitting
+        if (!name || !date || !time || !location || !description) {
+            alert('Please fill out all fields');
+            return;
+        }
+
         // Send a POST request to add the new party
-        fetch('https://fsa-crud-2aa9294fe819.herokuapp.com/api/2310-FSA-ET-WEB-PT-SF-B/recipes', {
+        fetch('https://fsa-crud-2aa9294fe819.herokuapp.com/api/2310-FSA-ET-WEB-PT-SF-B/events', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -29,21 +35,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 description,
             }),
         })
-        .then(response => response.json())
-        .then(data => {
-            // Add the new party to the list
-            addPartyToList(data);
-        })
-        .catch(error => console.error('Error adding party:', error));
+            .then(response => response.json())
+            .then(data => {
+                // Add the new party to the list
+                addPartyToList(data);
+            })
+            .catch(error => console.error('Error adding party:', error));
     });
 
     function fetchParties() {
         // Fetch parties from the API
-        fetch('https://fsa-crud-2aa9294fe819.herokuapp.com/api/2310-FSA-ET-WEB-PT-SF-B/recipes')
+        fetch('https://fsa-crud-2aa9294fe819.herokuapp.com/api/2310-FSA-ET-WEB-PT-SF-B/events')
             .then(response => response.json())
             .then(responseData => {
                 console.log('API Response:', responseData); // Log the API response to inspect it
-    
+
                 // Check if data is an array or has the expected structure
                 if (Array.isArray(responseData.data)) {
                     // Display parties in the list
@@ -61,6 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function addPartyToList(party) {
         // Create list item for the party
         const listItem = document.createElement('li');
+        listItem.setAttribute('data-id', party.id); // Add the data-id attribute
         listItem.innerHTML = `
             <strong>${party.name}</strong><br>
             Date: ${new Date(party.date).toLocaleDateString()}<br>
@@ -69,22 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
             Description: ${party.description}<br>
             <button onclick="deleteParty(${party.id})">Delete</button>
         `;
-
+    
         // Add the list item to the party list
         partyList.appendChild(listItem);
     }
-
-    function deleteParty(partyId) {
-        // Send a DELETE request to remove the party
-        fetch(`https://fsa-crud-2aa9294fe819.herokuapp.com/api/2310-FSA-ET-WEB-PT-SF-B/recipes/${partyId}`, {
-            method: 'DELETE',
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Remove the party from the list
-            const listItem = document.querySelector(`li:has(button[onclick="deleteParty(${partyId})"])`);
-            listItem.remove();
-        })
-        .catch(error => console.error('Error deleting party:', error));
-    }
-});
