@@ -8,55 +8,21 @@ document.addEventListener('DOMContentLoaded', function () {
     // Fetch parties from the API on page load
     fetchParties();
 
-    partyForm.addEventListener('submit', function (event) {
+    partyForm.addEventListener('submit', handlePartyFormSubmit);
+
+    function handlePartyFormSubmit(event) {
         event.preventDefault();
-
-        // Get party information from the form
-        const name = document.getElementById('name').value;
-        const date = new Date(document.getElementById('date').value).toISOString();
-        const time = document.getElementById('time').value;
-        const location = document.getElementById('location').value;
-        const description = document.getElementById('description').value;
-
-        // Send a POST request to add the new party
-        fetch('https://fsa-crud-2aa9294fe819.herokuapp.com/api/2310-FSA-ET-WEB-PT-SF-B/events', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                name,
-                date,
-                time,
-                location,
-                description,
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Add the new party to the list
-            addPartyToList(data);
-
-            // Update the global variable with the new data
-            partiesData.push(data);
-        })
-        .catch(error => console.error('Error adding party:', error));
-    });
+        const partyData = getPartyFormData();
+        addParty(partyData);
+    }
 
     function fetchParties() {
-        // Fetch parties from the API
         fetch('https://fsa-crud-2aa9294fe819.herokuapp.com/api/2310-FSA-ET-WEB-PT-SF-B/events')
             .then(response => response.json())
             .then(responseData => {
-                console.log('API Response:', responseData);
-
                 if (Array.isArray(responseData.data)) {
-                    // Update the global variable with the fetched data
-                    partiesData = responseData.data;
-
-                    responseData.data.forEach(party => {
-                        addPartyToList(party);
-                    });
+                    updatePartiesData(responseData.data);
+                    responseData.data.forEach(addPartyToList);
                 } else {
                     console.error('Unexpected API response:', responseData);
                 }
@@ -64,50 +30,84 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error fetching parties:', error));
     }
 
-    function addPartyToList(party) {
-        // Create list item for the party
-        const listItem = document.createElement('li');
-
-        // Create delete button
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        deleteButton.addEventListener('click', () => deleteParty(party.id));
-
-        // Append elements to list item
-        listItem.appendChild(document.createElement('strong')).textContent = party.name;
-        listItem.appendChild(document.createElement('br')).textContent = `Date: ${new Date(party.date).toLocaleDateString()}`;
-        listItem.appendChild(document.createElement('br')).textContent = `Time: ${party.time}`;
-        listItem.appendChild(document.createElement('br')).textContent = `Location: ${party.location}`;
-        listItem.appendChild(document.createElement('br')).textContent = `Description: ${party.description}`;
-        listItem.appendChild(document.createElement('br'));
-        listItem.appendChild(deleteButton);
-
-        // Add the list item to the party list
-        partyList.appendChild(listItem);
-    }
-
-    function deleteParty(partyId) {
-        // Send a DELETE request to remove the party
-        fetch(`https://fsa-crud-2aa9294fe819.herokuapp.com/api/2310-FSA-ET-WEB-PT-SF-B/events/${partyId}`, {
-            method: 'DELETE',
+    function addParty(partyData) {
+        fetch('https://fsa-crud-2aa9294fe819.herokuapp.com/api/2310-FSA-ET-WEB-PT-SF-B/events', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(partyData),
         })
         .then(response => response.json())
         .then(data => {
-            console.log('Delete API Response:', data);
-    
-            if (data.success) {
-                // Remove the party from the list
-                const listItem = document.querySelector(`li:has(button[onclick="deleteParty(${partyId})"])`);
-                listItem.remove();
-    
-                // Update the global variable by removing the deleted party
-                partiesData = partiesData.filter(party => party.id !== partyId);
+            addPartyToList(data);
+            updatePartiesData([...partiesData, data]);
+        })
+        .catch(error => console.error('Error adding party:', error));
+    }
+
+    function addPartyToList(party) {
+        const listItem = createPartyListItem(party);
+        partyList.appendChild(listItem);
+    }
+
+    function createPartyListItem(party) {
+        const listItem = document.createElement('li');
+        listItem.appendChild(createElementWithText('strong', party.name));
+        listItem.appendChild(createElementWithText('br', `Date: ${new Date(party.date).toLocaleDateString()}`));
+        listItem.appendChild(createElementWithText('br', `Time: ${party.time}`));
+        listItem.appendChild(createElementWithText('br', `Location: ${party.location}`));
+        listItem.appendChild(createElementWithText('br', `Description: ${party.description}`));
+        listItem.appendChild(createElementWithText('br'));
+        listItem.appendChild(createDeleteButton(party.id));
+        return listItem;
+    }
+
+    function createElementWithText(tag, text) {
+        const element = document.createElement(tag);
+        element.textContent = text;
+        return element;
+    }
+
+    function createDeleteButton(partyId) {
+        const deleteButton = createElementWithText('button', 'Delete');
+        deleteButton.addEventListener('click', () => deleteParty(partyId));
+        return deleteButton;
+    }
+
+    function deleteParty(partyId) {
+        fetch(`https://fsa-crud-2aa9294fe819.herokuapp.com/api/2310-FSA-ET-WEB-PT-SF-B/events/${partyId}`, {
+            method: 'DELETE',
+        })
+        .then(response => {
+            if (response.ok) {
+                removePartyFromList(partyId);
+                updatePartiesData(partiesData.filter(party => party.id !== partyId));
             } else {
-                console.error('Error deleting party:', data.error);
+                console.error('Error deleting party:', response.error);
             }
         })
         .catch(error => console.error('Error deleting party:', error));
     }
+
+    function removePartyFromList(partyId) {
+        const listItem = Array.from(partyList.children).find(item => item.querySelector(`button[data-party-id="${partyId}"]`));
+        if (listItem) {
+            listItem.remove();
+        }
+    }
+
+    function getPartyFormData() {
+        return {
+            name: document.getElementById('name').value,
+            date: new Date(document.getElementById('date').value).toISOString(),
+            time: document.getElementById('time').value,
+            location: document.getElementById('location').value,
+            description: document.getElementById('description').value,
+        };
+    }
+
+    function updatePartiesData(newData) {
+        partiesData = newData;
+    }
 });
-
-
