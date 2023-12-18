@@ -1,38 +1,37 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Party Planner</title>
-    <link rel="stylesheet" href="./index.css" />
+    <link rel="stylesheet" href="Index.css" />
+    <script defer src="Index.js"></script>
 </head>
 <body>
-    <div id="app">
-        <h1>Party List</h1>
-        
-        <!-- Form to add a new party -->
-        <form id="partyForm">
-            <label for="name">Name:</label>
-            <input type="text" id="name" required>
-            
-            <label for="date">Date:</label>
-            <input type="date" id="date" required>
-            
-            <label for="time">Time:</label>
-            <input type="time" id="time" required>
-            
-            <label for="location">Location:</label>
-            <input type="text" id="location" required>
-            
-            <label for="description">Description:</label>
-            <textarea id="description" required></textarea>
-            
-            <button type="submit">Add Party</button>
-        </form>
-
-        <!-- Party List -->
-        <ul id="partyList"></ul>
+    <h1>Party Planner</h1>
+<form>
+    <label> Event Name:  
+        <input id="inputName" class="inputBoxes" size="30" type="text" name="name" />
+    </label>
+    <label> Event Date: 
+        <input id="inputDate" class="inputBoxes" size="30" type="date" name="date" />
+    </label>
+    <label> Event Time: 
+        <input id="inputTime" class="inputBoxes" size="30" type="time" name="time" />
+    </label>
+    <label> Event Location: 
+        <input id="inputLocation" class="inputBoxes" size="30" type="text" name="location" />
+    </label>
+    <label> Event Description: 
+        <input id="inputDescription" class="inputBoxes" size="30" type="text" name="description" />
+    </label>
+    <div id="addEventElement">
+        <button id="addEvent" >Add Event</button>
     </div>
-
-    <script src="./index.js"></script>
-   </body>
-  </html>
+</form>
+<h2>
+    Party Tracker
+</h2>
+<div id="eventDisplay"></div>
+</body>
+</html>
